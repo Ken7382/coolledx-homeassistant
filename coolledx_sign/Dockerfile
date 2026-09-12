@@ -25,8 +25,12 @@ RUN git clone --depth 1 \
     /opt/coolledx-driver
 
 # The upstream package metadata is invalid, so install the source manually.
-RUN cp -r /opt/coolledx-driver/src/coolledx \
-    /opt/venv/lib/python3.14/site-packages/coolledx
+#RUN cp -r /opt/coolledx-driver/src/coolledx \
+#    /opt/venv/lib/python3.14/site-packages/coolledx
+
+RUN SITE_PACKAGES="$(python3 -c 'import site; print(site.getsitepackages()[0])')" \
+    && cp -r /opt/coolledx-driver/src/coolledx \
+    "$SITE_PACKAGES/coolledx"
 
 COPY run.sh /run.sh
 COPY server.py /server.py

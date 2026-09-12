@@ -1,46 +1,28 @@
-FROM ghcr.io/home-assistant/base:latest
+```dockerfile
+ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:latest
+FROM ${BUILD_FROM}
 
-SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+WORKDIR /opt
 
 RUN apk add --no-cache \
-    git \
-    python3 \
-    py3-pip
+    git
 
-RUN python3 -m venv /opt/venv
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install \
+        "bleak-esphome==4.1.0" \
+        "habluetooth" \
+        "fastapi>=0.115,<1" \
+        "uvicorn[standard]>=0.34,<1" \
+        "python-multipart>=0.0.20,<1"
 
-ENV PATH="/opt/venv/bin:$PATH"
-
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel
-
-RUN pip install --no-cache-dir \
-    "bleak-esphome==4.1.0" \
-    "fastapi>=0.115,<1" \
-    "uvicorn[standard]>=0.34,<1" \
-    "python-multipart>=0.0.20,<1" \
-    "Pillow>=11,<12"
-
-RUN git clone --depth 1 \
-    https://github.com/UpDryTwist/coolledx-driver.git \
-    /opt/coolledx-driver
-
-# The upstream package metadata is invalid, so install the source manually.
-#RUN cp -r /opt/coolledx-driver/src/coolledx \
-#    /opt/venv/lib/python3.14/site-packages/coolledx
-
-RUN SITE_PACKAGES="$(python3 -c 'import site; print(site.getsitepackages()[0])')" \
-    && cp -r /opt/coolledx-driver/src/coolledx \
-    "$SITE_PACKAGES/coolledx"
+RUN git clone --depth 1 https://github.com/UpDryTwist/coolledx-driver.git /opt/coolledx-driver \
+    && sed -i 's/name = "CoolLEDX Driver"/name = "coolledx-driver"/' /opt/coolledx-driver/pyproject.toml \
+    && pip install /opt/coolledx-driver
 
 COPY run.sh /run.sh
+RUN chmod a+x /run.sh
+
 COPY server.py /server.py
 
-RUN chmod +x /run.sh
-
-LABEL \
-    io.hass.name="CoolLEDX Sign" \
-    io.hass.description="Control a CoolLEDX Bluetooth LED sign through an ESPHome Bluetooth proxy" \
-    io.hass.type="addon" \
-    io.hass.version="0.1.0"
-
 CMD ["/run.sh"]
+```

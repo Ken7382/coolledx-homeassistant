@@ -1,10 +1,15 @@
-ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:latest
-FROM ${BUILD_FROM}
+FROM ghcr.io/home-assistant/base:latest
 
 WORKDIR /opt
 
 RUN apk add --no-cache \
+    python3 \
+    py3-pip \
     git
+
+RUN echo "==================================================" \
+    && echo "BUILDING NEW COOLLEDX IMAGE - PATCHED VERSION" \
+    && echo "=================================================="
 
 RUN pip install --upgrade pip setuptools wheel \
     && pip install \

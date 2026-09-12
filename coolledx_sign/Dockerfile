@@ -1,22 +1,42 @@
 FROM ghcr.io/home-assistant/base:latest
 
-ARG BUILD_VERSION
-ARG BUILD_ARCH
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
-RUN apk add --no-cache     python3     py3-pip     git
+RUN apk add --no-cache \
+    git \
+    python3 \
+    py3-pip
 
 RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"     PYTHONUNBUFFERED=1     PIP_NO_CACHE_DIR=1
 
-RUN pip install --upgrade pip setuptools wheel     && pip install "bleak-esphome==4.1.0" "fastapi>=0.115,<1" "uvicorn[standard]>=0.34,<1" "python-multipart>=0.0.20,<1"
+ENV PATH="/opt/venv/bin:$PATH"
 
-RUN git clone --depth 1 https://github.com/UpDryTwist/coolledx-driver.git /opt/coolledx-driver     && pip install /opt/coolledx-driver
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+
+RUN pip install --no-cache-dir \
+    "bleak-esphome==4.1.0" \
+    "fastapi>=0.115,<1" \
+    "uvicorn[standard]>=0.34,<1" \
+    "python-multipart>=0.0.20,<1" \
+    "Pillow>=11,<12"
+
+RUN git clone --depth 1 \
+    https://github.com/UpDryTwist/coolledx-driver.git \
+    /opt/coolledx-driver
+
+# The upstream package metadata is invalid, so install the source manually.
+RUN cp -r /opt/coolledx-driver/src/coolledx \
+    /opt/venv/lib/python3.14/site-packages/coolledx
 
 COPY run.sh /run.sh
 COPY server.py /server.py
 
 RUN chmod +x /run.sh
 
-LABEL     io.hass.version="${BUILD_VERSION}"     io.hass.type="app"     io.hass.arch="${BUILD_ARCH}"
+LABEL \
+    io.hass.name="CoolLEDX Sign" \
+    io.hass.description="Control a CoolLEDX Bluetooth LED sign through an ESPHome Bluetooth proxy" \
+    io.hass.type="addon" \
+    io.hass.version="0.1.0"
 
 CMD ["/run.sh"]

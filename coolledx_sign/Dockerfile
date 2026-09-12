@@ -7,9 +7,11 @@ RUN apk add --no-cache \
     py3-pip \
     git
 
-RUN echo "==================================================" \
-    && echo "BUILDING NEW COOLLEDX IMAGE - PATCHED VERSION" \
-    && echo "=================================================="
+RUN python3 -m venv /opt/venv
+
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
 
 RUN pip install --upgrade pip setuptools wheel \
     && pip install \

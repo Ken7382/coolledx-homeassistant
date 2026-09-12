@@ -6,6 +6,11 @@ WORKDIR /opt
 RUN apk add --no-cache \
     git
 
+RUN echo "==================================================" \
+    && echo "BUILDING NEW COOLLEDX IMAGE - PATCHED VERSION" \
+    && echo "==================================================" \
+    && grep -n "COLOR_TYPE_MONO" /opt/coolledx-driver/src/coolledx/hardware.py
+
 RUN pip install --upgrade pip setuptools wheel \
     && pip install \
         "bleak-esphome==4.1.0" \

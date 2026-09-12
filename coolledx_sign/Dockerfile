@@ -14,9 +14,11 @@ RUN pip install --upgrade pip setuptools wheel \
         "uvicorn[standard]>=0.34,<1" \
         "python-multipart>=0.0.20,<1"
 
-RUN git clone --depth 1 https://github.com/UpDryTwist/coolledx-driver.git /opt/coolledx-driver \
+RUN rm -rf /opt/coolledx-driver \
+    && git clone --depth 1 https://github.com/UpDryTwist/coolledx-driver.git /opt/coolledx-driver \
     && sed -i 's/name = "CoolLEDX Driver"/name = "coolledx-driver"/' /opt/coolledx-driver/pyproject.toml \
     && sed -i 's/from \.commands import COLOR_TYPE_MONO/COLOR_TYPE_MONO = 0x00/' /opt/coolledx-driver/src/coolledx/hardware.py \
+    && grep -n "COLOR_TYPE_MONO" /opt/coolledx-driver/src/coolledx/hardware.py \
     && pip install /opt/coolledx-driver
 
 COPY run.sh /run.sh

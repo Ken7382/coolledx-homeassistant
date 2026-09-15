@@ -25,11 +25,10 @@ RUN rm -rf /opt/coolledx-driver \
     && git clone --depth 1 https://github.com/UpDryTwist/coolledx-driver.git /opt/coolledx-driver \
     && sed -i 's/name = "CoolLEDX Driver"/name = "coolledx-driver"/' /opt/coolledx-driver/pyproject.toml \
     && sed -i 's/from \.commands import COLOR_TYPE_MONO/COLOR_TYPE_MONO = 0x00/' /opt/coolledx-driver/src/coolledx/hardware.py \
-    && echo "===== SOURCE FILE AFTER PATCH =====" \
+    && sed -i 's/return \[self.create_command(x) for x in raw_data_chunks\]/return raw_data_chunks/' /opt/coolledx-driver/src/coolledx/commands.py \
     && grep -n "COLOR_TYPE_MONO" /opt/coolledx-driver/src/coolledx/hardware.py \
-    && pip install --no-cache-dir /opt/coolledx-driver \
-    && echo "===== INSTALLED FILE =====" \
-    && grep -n "COLOR_TYPE_MONO" /opt/venv/lib/python3.14/site-packages/coolledx/hardware.py
+    && grep -n "get_command_chunks" -A8 /opt/coolledx-driver/src/coolledx/commands.py \
+    && pip install /opt/coolledx-driver
     
 COPY run.sh /run.sh
 RUN chmod a+x /run.sh

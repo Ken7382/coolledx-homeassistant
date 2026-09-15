@@ -1,5 +1,5 @@
 name: CoolLEDX Sign
-version: "0.1.4"
+version: "0.1.5"
 slug: coolledx_sign
 description: Control a CoolLEDX 16x32 Bluetooth LED sign through an ESPHome Bluetooth proxy.
 url: https://github.com/UpDryTwist/coolledx-driver

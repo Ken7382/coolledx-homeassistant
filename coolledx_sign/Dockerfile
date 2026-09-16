@@ -25,7 +25,7 @@ RUN rm -rf /opt/coolledx-driver \
     && git clone --depth 1 https://github.com/UpDryTwist/coolledx-driver.git /opt/coolledx-driver \
     && sed -i 's/name = "CoolLEDX Driver"/name = "coolledx-driver"/' /opt/coolledx-driver/pyproject.toml \
     && sed -i 's/from \.commands import COLOR_TYPE_MONO/COLOR_TYPE_MONO = 0x00/' /opt/coolledx-driver/src/coolledx/hardware.py \
-    && sed -i 's/return \[self.create_command(x) for x in raw_data_chunks\]/return raw_data_chunks/' /opt/coolledx-driver/src/coolledx/commands.py \
+    && sed -i 's/return \[self.create_command(x) for x in raw_data_chunks\]/return [self.create_command(x) for x in raw_data_chunks]/' /opt/coolledx-driver/src/coolledx/commands.py \
     && sed -i 's/raw_command_bytes\[i + 1\] - ESCAPE_OFFSET/(raw_command_bytes[i + 1] - ESCAPE_OFFSET) % 256/' /opt/coolledx-driver/src/coolledx/decoder.py \
     && grep -n "COLOR_TYPE_MONO" /opt/coolledx-driver/src/coolledx/hardware.py \
     && grep -n "get_command_chunks" -A8 /opt/coolledx-driver/src/coolledx/commands.py \
